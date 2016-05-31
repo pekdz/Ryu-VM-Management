@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta name="description" content="A virtual machine management system">
+    <title>虚拟机智能迁移系统</title>
+
+    <!-- CORE CSS-->
+    <link href="assets/css/materialize.min.css" type="text/css" rel="stylesheet">
+    <link href="assets/css/style.min.css" type="text/css" rel="stylesheet">
+    <!-- Plugin CSS -->
+    <link href="assets/css/next.css" rel="stylesheet">
+    <link href="assets/css/toastr.min.css" type="text/css" rel="stylesheet">
+    <link href="assets/css/jquery-confirm.min.css" type="text/css" rel="stylesheet">
+    <!-- Custom CSS-->
+    <link href="custom/main.css" type="text/css" rel="stylesheet">
+</head>
+
+<body>
+<!-- Start 网站载入特效 -->
+<div id="loader-wrapper">
+    <div id="loader"></div>
+    <div class="loader-section section-left"></div>
+    <div class="loader-section section-right"></div>
+</div>
+<!-- End 网站载入特效 -->
+
+<!-- //////////////////////////////////////////////////////////////////////////// -->
+
+<!-- START 顶部导航栏 -->
+<header id="header" class="page-topbar">
+    <!-- start header nav-->
+    <div class="navbar-fixed">
+        <nav class="navbar-color cyan">
+            <div class="nav-wrapper">
+                <ul class="left">
+                    <li><h1 class="logo-wrapper"><a href="#" class="brand-logo darken-1">
+                            <img src="assets/images/svmc-logo.png" alt="SVMM"></a>
+                        </h1>
+                    </li>
+                </ul>
+                <div class="header-time-wrapper hide-on-med-and-down">
+                    <!--时间显示-->
+                    <ul>
+                        <li id="hours"> </li>
+                        <li>:</li>
+                        <li id="min"> </li>
+                        <li>:</li>
+                        <li id="sec"> </li>
+                    </ul>
+
+                </div>
+                <ul class="right hide-on-med-and-down">
+                    <li style="width:60px">
+                        <a href="javascript:void(0);" class="waves-effect waves-block waves-light notification-button" data-activates="notifications-dropdown">
+                            <i class="mdi-social-notifications"><small class="notification-badge red lighten-1" id="logCount2">0</small></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a id="full-screen-btn" href="javascript:void(0);" class="waves-effect waves-block waves-light"><i class="mdi-action-settings-overscan"></i></a>
+                    </li>
+                </ul>
+
+                <!--TODO: Notification List -->
+                <ul id="notifications-dropdown" class="dropdown-content">
+                    <li>
+                        <h5>新警告 <span class="new badge red lighten-1" id="logCount">0</span></h5>
+                    </li>
+                    <li class="divider"></li>
+
+                </ul>
+            </div>
+        </nav>
+    </div>
+    <!-- end header nav-->
+</header>
+<!-- END 顶部导航栏 -->
+
+<!-- //////////////////////////////////////////////////////////////////////////// -->
+
+<!-- START 主界面 -->
+<div class="wrapper">
+    <section id="content">
+        <!--start 主内容-->
+        <div class="container">
+            <div class="row">
+                <div class="col s12 m7">
+                    <div id="topology-graph" class="card"></div>
+                    <div class="row">
+                        <div class="col m7">
+                            <div id="card-alert" class="card">
+                                <div id="migrate-log-list" class="card-content cyan-text" style="overflow-y: auto; height: 160px">
+                                    <!--<p><i class="mdi-social-notifications"></i> 虚拟机迁移: OVS-1 Port1  ->  OVS-3 Port3 <span class="right"><i class="mdi-av-timer"></i> 2016-04-29 20:22:45</span></p>-->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col m5">
+                            <table id="predict-table" class="display centered responsive-table striped" cellspacing="0">
+                                <thead>
+                                <tr>
+                                    <th>OVS - 1</th>
+                                    <th>OVS - 2</th>
+                                    <th>OVS - 3</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td id="dp1-predict" class="port-speed">0</td>
+                                        <td id="dp2-predict" class="port-speed">0</td>
+                                        <td id="dp3-predict" class="port-speed">0</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <br>
+                            <button class="btn cyan refresh-btn right" type="button" id="getPredictBtn" onclick="getPrediction()">刷新预测
+                                <i class="mdi-navigation-refresh right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+
+                </div>
+                <div class="col s12 m5">
+                    <h5 class="migration-title">虚拟机管理</h5>
+                    <form id="migrate-form">
+                        <div class="row">
+                            <div class="input-field col m6">
+                                <select id="src_dp" name="src_dp">
+                                    <option value="1" name="2" selected>OVS-1</option>
+                                    <option value="2" name="2">OVS-2</option>
+                                    <option value="3" name="3">OVS-3</option>
+                                </select>
+                                <label for="src_dp">源交换机</label>
+                            </div>
+                            <div class="input-field col m6">
+                                <select id="src_port" name="src_port">
+                                    <option value="1" name="2" selected>1</option>
+                                    <option value="2" name="2">2</option>
+                                    <option value="3" name="3">3</option>
+                                    <option value="4" name="4">4</option>
+                                </select>
+                                <label for="src_port">源端口</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col m6">
+                                <select id="dst_dp" name="dst_dp">
+                                    <option value="1" name="2" selected>OVS-1</option>
+                                    <option value="2" name="2">OVS-2</option>
+                                    <option value="3" name="3">OVS-3</option>
+                                </select>
+                                <label for="dst_dp">目的交换机</label>
+                            </div>
+                            <div class="input-field col m6">
+                                <select id="dst_port" name="dst_port">
+                                    <option value="1" name="2" selected>1</option>
+                                    <option value="2" name="2">2</option>
+                                    <option value="3" name="3">3</option>
+                                    <option value="4" name="4">4</option>
+                                </select>
+                                <label for="dst_port">目的端口</label>
+                            </div>
+                        </div>
+                        <div class="input-field col s12" style="margin-top: 0">
+                            <div class="container" style="display:flex">
+                                <button class="btn cyan send-btn" type="button" onclick="createVM()">创建虚拟机
+                                    <i class="mdi-content-add right"></i>
+                                </button>
+                                <button class="btn cyan send-btn" type="button" onclick="deleteVM()">删除虚拟机
+                                    <i class="mdi-content-remove right"></i>
+                                </button>
+                                <button class="btn cyan send-btn" type="button" onclick="postMigrate()">下发策略
+                                    <i class="mdi-content-send right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="divider" style="margin-top: 60px; height:2px"></div>
+                    <h5 class="migration-title">实时统计</h5>
+                    <table id="speed-table" class="display centered responsive-table striped" cellspacing="0">
+                        <thead>
+                        <tr>
+                            <th>交换机</th>
+                            <th>端口</th>
+                            <th>总转发包</th>
+                            <th>总丢包</th>
+                            <th>速率</th>
+                        </tr>
+                        </thead>
+                        <tbody id="speed-table-content">
+                        <!--<tr>
+                            <td class="switch-name">1</td>
+                            <td>1</td>
+                            <td class="port-packet">122332</td>
+                            <td class="port-packet">233222</td>
+                            <td class="port-speed">575</td>
+                        </tr>-->
+
+                        </tbody>
+                    </table>
+
+                </div>
+
+
+            </div>
+        </div>
+        <!--end 主内容-->
+    </section>
+    <!-- END 右侧主面板 -->
+
+</div>
+<!-- END 主界面 -->
+<!--隐藏: 虚拟机创建/删除模态框-->
+<div id="vmModal" class="modal modal-fixed-footer">
+    <div class="modal-content">
+        <h5 class="center" id="vm-modal-title">创建虚拟机</h5>
+        <div class="divider"></div>
+        <div class="container" style="padding: 30px 50px 0 50px">
+            <form id="vm-form">
+                <div class="row">
+                    <div class="input-field col m12">
+                        <label for="vm_dp">所在交换机</label>
+                        <div class="col push-s2 s10">
+                            <select id="vm_dp" name="dpid">
+                                <option value="1" name="2" selected>OVS-1</option>
+                                <option value="2" name="2">OVS-2</option>
+                                <option value="3" name="3">OVS-3</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="input-field col m12">
+                        <label for="vm_port">所在端口</label>
+                        <div class="col push-s2 s10">
+                            <select id="vm_port" name="port">
+                                <option value="1" name="2" selected>1</option>
+                                <option value="2" name="2">2</option>
+                                <option value="3" name="3">3</option>
+                                <option value="4" name="4">4</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="input-field col s12">
+                        <label for="vm_vni">所属VNI</label>
+                        <div class="col push-s2 s10">
+                            <input id="vm_vni" name="vni" type="number">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <p class="red-text" id="modify-vm-status">虚拟机操作失败, 请稍后再试 !</p>
+                    <div class="input-field col s12" style="margin-top: 15px">
+                        <button class="btn cyan waves-effect waves-light send-btn right" id="vm-confirm-btn"
+                                name="create" onclick="modifyVM(this.name)" type="button">确认操作
+                            <i class="mdi-content-send right"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- //////////////////////////////////////////////////////////////////////////// -->
+
+<!-- START 底部版权栏 -->
+<footer class="page-footer">
+    <div class="footer-copyright">
+        <div class="container">
+            <span>版权所有 © <a class="grey-text text-lighten-4" href="#">BUPT - Dong Zhao</a></span>
+            <span class="right">虚拟机智能迁移系统</span>
+        </div>
+    </div>
+</footer>
+<!-- END 底部版权栏 -->
+
+
+<!-- ================================================
+Scripts
+================================================ -->
+
+<!-- jQuery Library -->
+
+<script type="text/javascript" src="assets/js/jquery.min.js"></script>
+<!--materialize js-->
+<script type="text/javascript" src="assets/js/materialize.min.js"></script>
+<script type="text/javascript" src="assets/js/moment.min.js"></script>
+<script type="text/javascript" src="assets/js/reconnecting-websocket.min.js"></script>
+<script type="text/javascript" src="assets/js/jquery-confirm.min.js"></script>
+<script type="text/javascript" src="assets/js/toastr.min.js"></script>
+<script type="text/javascript" src="assets/js/screenfull.min.js"></script>
+<script type="text/javascript" src="assets/js/next.js"></script>
+<!--Custom JS-->
+<script type="text/javascript" src="custom/plugins.js"></script>
+<script type="text/javascript" src="custom/main.js"></script>
+
+</body>
+
+</html>

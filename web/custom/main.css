@@ -1,0 +1,174 @@
+html {
+    background-color: #F9F9F9;
+}
+
+header .brand-logo img {
+    width: 120px;
+    margin-left: 30px;
+}
+
+/*顶部导航栏时钟*/
+.header-time-wrapper {
+    height: 40px;
+    display: inline-block;
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%);
+    -webkit-transform: translate(-50%);
+    -moz-transform: translate(-50%);
+    -ms-transform: translate(-50%);
+}
+
+.header-time-wrapper #Date {
+    font-size: 2rem;
+    text-align: center;
+    display: inline-block
+}
+
+.header-time-wrapper ul {
+    width: 200px;
+    margin: 0 auto;
+    padding: 0;
+    list-style: none;
+    text-align: center;
+    display: inline-block;
+}
+
+.header-time-wrapper ul li {
+    display: inline;
+    font-size: 2rem;
+    text-align: center;
+}
+
+.header-time-wrapper ul li:hover {
+    background: none;
+}
+
+@-webkit-keyframes mymove {
+    0% {
+        opacity: 1.0;
+        text-shadow: 0 0 20px #00c6ff;
+    }
+    50% {
+        opacity: 0;
+        text-shadow: none;
+    }
+    100% {
+        opacity: 1.0;
+        text-shadow: 0 0 20px #00c6ff;
+    }
+}
+
+@-moz-keyframes mymove {
+    0% {
+        opacity: 1.0;
+        text-shadow: 0 0 20px #00c6ff;
+    }
+    50% {
+        opacity: 0;
+        text-shadow: none;
+    }
+    100% {
+        opacity: 1.0;
+        text-shadow: 0 0 20px #00c6ff;
+    }
+}
+
+#content {
+    min-height: 590px;
+}
+
+#breadcrumbs-wrapper .breadcrumbs-title{
+    display: inline-block;
+}
+
+#breadcrumbs-wrapper .breadcrumbs {
+    display: inline-block;
+    float: right;
+}
+
+#basic-tabs .tab-content{
+    padding: 10px;
+}
+
+#basic-tabs input[type=search] {
+    height: 2rem;
+}
+
+#notifications-dropdown {
+    width: 250px;
+}
+
+#notifications-dropdown li{
+    padding-left:30px;
+    padding-right: 30px;
+}
+
+.input-field div.error{
+    position: relative;
+    top: -1rem;
+    left: 0;
+    font-size: 0.8rem;
+    color:#ef5350;
+    -webkit-transform: translateY(0%);
+    -ms-transform: translateY(0%);
+    -o-transform: translateY(0%);
+    transform: translateY(0%);
+}
+
+.topo-title {
+    text-align: center;
+    font-size: 1.8rem;
+}
+
+.topology-next {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.topology-tooltip {
+    width: 200px;
+    text-align: center;
+}
+
+.migration-area {
+
+}
+
+.migration-title {
+    text-align: center;
+}
+
+#speed-table .switch-name:before{
+    content: "OVS - ";
+}
+
+#speed-table .port-packet:after{
+    content: " KB";
+}
+
+#speed-table .port-speed:after{
+    content: " Bps";
+}
+
+#predict-table .port-speed:after{
+    content: " Bps";
+}
+
+.refresh-btn, .send-btn {
+    line-height: 2rem;
+    height: 3rem;
+    flex: 1;
+    margin: 0 18px;
+}
+
+#modify-vm-status{
+    text-align: center;
+    display: none;
+    -webkit-animation: fadein 2s; /* Safari, Chrome and Opera > 12.1 */
+    -moz-animation: fadein 2s; /* Firefox < 16 */
+    -ms-animation: fadein 2s; /* Internet Explorer */
+    -o-animation: fadein 2s; /* Opera < 12.1 */
+    animation: fadein 2s;
+}
